@@ -26,4 +26,4 @@ jobs:
           role-to-assume: arn:aws:iam::175081627259:role/tech-challenge-oicd-githubactions
           aws-region: us-east-1
       - run: sam build
-      - run: sam deploy
+      - run: sam deploy --stack-name tech-challenge-lambda --s3-bucket tech-challenge-lambda
