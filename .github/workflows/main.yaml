@@ -25,5 +25,7 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::175081627259:role/tech-challenge-oicd-githubactions
           aws-region: us-east-1
-      - run: sam build
-      - run: sam deploy --stack-name tech-challenge-lambda --s3-bucket tech-challenge-lambda
+      # Build inside Docker containers
+      - run: sam build --use-container
+      # Prevent prompts and failure when the stack is unchanged
+      - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
