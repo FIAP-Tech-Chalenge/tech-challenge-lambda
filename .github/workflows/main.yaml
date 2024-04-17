@@ -23,7 +23,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
       - uses: aws-actions/configure-aws-credentials@v2
         with:
-          role-to-assume: ${{ secrets.ROLE }}
+          role-to-assume: arn:aws:iam::175081627259:role/tech-challenge-oicd-githubactions
           aws-region: us-east-1
       - run: sam build
       - run: sam deploy
