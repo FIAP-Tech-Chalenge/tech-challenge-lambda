@@ -1,0 +1,14 @@
+#Deploy realizado via action https://github.com/marketplace/actions/setup-aws-sam-cli
+name: Faz o deploy da lambda 
+
+on:
+  push:
+    branches:
+      - adiciona-lambda
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup AWS SAM CLI
+        uses: aws-actions/setup-sam@v2
