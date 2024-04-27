@@ -11,7 +11,7 @@ Globals:
     Timeout: 3
 
 Resources:
-  AuthenticationFuncion:
+  AuthenticationFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       CodeUri: authenticate/
@@ -25,3 +25,6 @@ Resources:
           Properties:
             Path: /
             Method: get
+      Environment:
+        Variables:
+          LOCALSTACK_HOSTNAME: "localhost"
