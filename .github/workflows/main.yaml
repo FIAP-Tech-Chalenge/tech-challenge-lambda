@@ -28,4 +28,10 @@ jobs:
       # Build inside Docker containers
       - run: sam build
       # Prevent prompts and failure when the stack is unchanged
-      - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --resolve-s3 
+      - run: |
+          sam deploy \
+          --no-confirm-changeset --no-fail-on-empty-changeset --resolve-s3 \
+          --parameter-overrides \
+              USERPOOL_ID=${{ secrets.USERPOOL_ID }} \
+              CLIENT_ID=${{ secrets.CLIENT_ID }} \
+              REGION=${{ secrets.REGION }} 
