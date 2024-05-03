@@ -1,0 +1,31 @@
+name: Deploy AWS Lambda Function usando SAM 
+# Actions AWS usadas: 
+# - Setup SAM: https://github.com/marketplace/actions/setup-aws-sam-cli
+# - Configure AWS Credentials: https://github.com/marketplace/actions/configure-aws-credentials-action-for-github-actions
+
+on:
+  push:
+    branches:
+      - action-test
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: aws-actions/setup-sam@v2
+        with:
+          use-installer: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::175081627259:role/tech-challenge-oicd-githubactions
+          aws-region: us-east-1
+      # Build inside Docker containers
+      - run: sam build
+      # Prevent prompts and failure when the stack is unchanged
+      - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --resolve-s3 

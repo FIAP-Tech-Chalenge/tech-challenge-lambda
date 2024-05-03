@@ -16,10 +16,9 @@ lint = true
 [default.deploy.parameters]
 capabilities = "CAPABILITY_IAM"
 confirm_changeset = true
-resolve_s3 = true
+resolve_s3 = false
 s3_prefix = "tech-challenge-lambda"
 region = "us-east-1"
-profile = "lab"
 image_repositories = []
 
 [default.package.parameters]
