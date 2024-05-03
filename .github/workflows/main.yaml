@@ -6,7 +6,7 @@ name: Deploy AWS Lambda Function usando SAM
 on:
   push:
     branches:
-      - action-test
+      - main
 
 permissions:
   id-token: write
