@@ -13,22 +13,20 @@
 
 const { InitiateAuthCommand, CognitoIdentityProviderClient, AdminInitiateAuthCommand, SignUpCommand } = require("@aws-sdk/client-cognito-identity-provider");
 
-const userPoolId = "us-east-1_dZouqIbTE";
-const clientId = "ef115giv1usn8918ihjptsks8";
-const cognitoClient = new CognitoIdentityProviderClient({
-    region: "us-east-1",
-    // endpoint: "http://localhost:4566/",
-  });
+const userPoolId = process.env.USERPOOL_ID || 'default_value';
+const clientId = process.env.CLIENT_ID || 'default_value';
+const region = process.env.REGION || 'default_value';
+const cognitoClient = new CognitoIdentityProviderClient({region: region});
 
 module.exports.lambdaHandler = async (event, context) => {
     const cpf = event.cpf; // Obtenha o parâmetro CPF da requisição
 
-    if (!cpf) {
-        return {
-            statusCode: 400,
-            body: JSON.stringify({ error: "CPF is required" }),
-        };
-    }
+    // if (!cpf) {
+    //     return {
+    //         statusCode: 400,
+    //         body: JSON.stringify({ error: "CPF is required" }),
+    //     };
+    // }
 
     try {
         // Verifica se o usuário com esse CPF já existe no banco de dados
@@ -40,7 +38,7 @@ module.exports.lambdaHandler = async (event, context) => {
                 ClientId: clientId,
                 AuthParameters: {
                     USERNAME: cpf,
-                    PASSWORD: cpf, // usamos CPF como senha por simplicidade, em produção use um processo seguro para senhas
+                    PASSWORD: cpf,
                 },
             };
 
