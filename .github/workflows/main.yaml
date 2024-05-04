@@ -29,9 +29,8 @@ jobs:
       - run: sam build
       # Prevent prompts and failure when the stack is unchanged
       - run: |
-          sam deploy \
-          --no-confirm-changeset --no-fail-on-empty-changeset --resolve-s3 \
+          sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --resolve-s3 \
           --parameter-overrides \
-              USERPOOL_ID=${{ secrets.USERPOOL_ID }} \
-              CLIENT_ID=${{ secrets.CLIENT_ID }} \
-              REGION=${{ secrets.REGION }} 
+              UserPoolId=${{ secrets.USERPOOL_ID }} \
+              ClientId=${{ secrets.CLIENT_ID }} \
+              Region=${{ secrets.REGION }} 
