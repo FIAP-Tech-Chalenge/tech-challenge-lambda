@@ -17,6 +17,7 @@ Resources:
       CodeUri: authenticate/
       Handler: app.lambdaHandler
       Runtime: nodejs18.x
+      # Role: !GetAtt AuthenticationFunctionRole.Arn
       Architectures:
         - x86_64
       Events:
@@ -24,7 +25,7 @@ Resources:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
             Path: /authenticate
-            Method: get
+            Method: post
       Environment:
         Variables:
           USERPOOL_ID: ${{ secrets.USERPOOL_ID }}
