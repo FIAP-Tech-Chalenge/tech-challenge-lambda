@@ -75,7 +75,7 @@ const cpfExisteNoBancoDeDadosDaAplicacao = (cpf) => {
 
 const usuarioCadastradoCognito = async (email) => {
     try {
-        await cognitoClient.send(new AdminGetUserCommand({
+        const response = await cognitoClient.send(new AdminGetUserCommand({
             UserPoolId: userPoolId,
             Username: email,
         }));
