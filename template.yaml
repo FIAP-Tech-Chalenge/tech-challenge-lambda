@@ -30,7 +30,7 @@ Resources:
         Variables:
           UserPoolId: ${{ secrets.USERPOOL_ID }}
           ClientId: ${{ secrets.CLIENT_ID }}
-          Region: ${{ secrets.REGION }}
+          RegionName: ${{ secrets.REGION }}
 
 # Outputs:
 #   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
