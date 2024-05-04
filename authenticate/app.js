@@ -11,74 +11,29 @@
  * 
  */
 
-const { InitiateAuthCommand, CognitoIdentityProviderClient, AdminInitiateAuthCommand, SignUpCommand } = require("@aws-sdk/client-cognito-identity-provider");
+const { CognitoIdentityProviderClient, AdminInitiateAuthCommand, SignUpCommand, AdminGetUserCommand, AdminConfirmSignUpCommand  } = require("@aws-sdk/client-cognito-identity-provider");
 
 const userPoolId = process.env.USERPOOL_ID || 'default_value';
 const clientId = process.env.CLIENT_ID || 'default_value';
 const region = process.env.REGION || 'default_value';
 const cognitoClient = new CognitoIdentityProviderClient({region: region});
+const senhaPadrao = "Mudar#123"
 
 module.exports.lambdaHandler = async (event, context) => {
-    const cpf = event.cpf; // Obtenha o parâmetro CPF da requisição
 
-    // if (!cpf) {
-    //     return {
-    //         statusCode: 400,
-    //         body: JSON.stringify({ error: "CPF is required" }),
-    //     };
-    // }
-
+    const [cpf, email] = validaDadosDeEntrada(event)
     try {
-        // Verifica se o usuário com esse CPF já existe no banco de dados
-        const existeUsuarioNoBanco = true
-        if (existeUsuarioNoBanco) {
-            const authParams = {
-                AuthFlow: "ADMIN_NO_SRP_AUTH",
-                UserPoolId: userPoolId,
-                ClientId: clientId,
-                AuthParameters: {
-                    USERNAME: cpf,
-                    PASSWORD: cpf,
-                },
-            };
-
-            const authCommand = new AdminInitiateAuthCommand(authParams);
-            const authResult = await cognitoClient.send(authCommand);
-
+        if(cpfExisteNoBancoDeDadosDaAplicacao(cpf)) {
+            if(await usuarioCadastradoCognito(email)) {
+                return await autenticaUsuarioCognito(email)
+            }else{
+                await cadastraUsuarioNoUserPool(email)
+                return await autenticaUsuarioCognito(email)
+            }
+        }else {
             return {
-                statusCode: 200,
-                body: JSON.stringify({ token: authResult.AuthenticationResult.IdToken }),
-            };
-        } else {
-            // Se o usuário não existir, cadastra Banco
-            // Deopois cadastra no Cognito
-
-            const signUpParams = {
-                ClientId: clientId,
-                Username: cpf,
-                Password: cpf,
-            };
-
-            const signUpCommand = new SignUpCommand(signUpParams);
-            await cognitoClient.send(signUpCommand);
-
-            // Autentica o novo usuário
-            const authParams = {
-                AuthFlow: "ADMIN_NO_SRP_AUTH",
-                UserPoolId: userPoolId,
-                ClientId: clientId,
-                AuthParameters: {
-                    USERNAME: cpf,
-                    PASSWORD: cpf,
-                },
-            };
-
-            const authCommand = new AdminInitiateAuthCommand(authParams);
-            const authResult = await cognitoClient.send(authCommand);
-
-            return {
-                statusCode: 200,
-                body: JSON.stringify({ token: authResult.AuthenticationResult.IdToken }),
+                statusCode: 401,
+                body: JSON.stringify({ error: "AWS Lambda: CPF inexistente no banco da aplicação" }),
             };
         }
     } catch (error) {
@@ -88,3 +43,88 @@ module.exports.lambdaHandler = async (event, context) => {
         };
     }
 };
+
+
+const validaDadosDeEntrada = (event) => {
+    if (!event.body) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify({ message: "AWS Lambda: O corpo da requisição esta vazio" }),
+        };
+    }
+    try {
+        body = JSON.parse(event.body);
+        const {cpf, email} = body
+        if(!((cpf && cpf != "") && (email && email != ""))) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ error: "AWS Lambda: Dados de entrada invalidos" }),
+            };
+        }
+        return [cpf, email]
+    } catch (error) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify({ error: "AWS Lambda: Falha ao extrair corpo da requisição" }),
+        };
+    }
+}
+
+const cpfExisteNoBancoDeDadosDaAplicacao = (cpf) => {
+    return true
+}
+
+const usuarioCadastradoCognito = async (email) => {
+    try {
+        const response = await cognitoClient.send(new AdminGetUserCommand({
+            UserPoolId: userPoolId,
+            Username: email,
+        }));
+        return true
+    } catch (error) {
+        return false
+    }
+};
+
+const cadastraUsuarioNoUserPool = async (email) => {
+    try{
+        const signUpParams = {
+            ClientId: clientId,
+            Username: email,
+            Password: senhaPadrao,
+        };
+    
+        const signUpCommand = new SignUpCommand(signUpParams);
+        await cognitoClient.send(signUpCommand);
+        
+        await cognitoClient.send(new AdminConfirmSignUpCommand({
+            UserPoolId: userPoolId,
+            Username: email,
+        }));
+    } catch (error) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify({ error: "AWS IAM: Falha ao cadastrar usuário" }),
+        };
+    }
+}
+
+const autenticaUsuarioCognito = async (email) => {
+    const authParams = {
+        AuthFlow: "ADMIN_NO_SRP_AUTH",
+        UserPoolId: userPoolId,
+        ClientId: clientId,
+        AuthParameters: {
+            USERNAME: email,
+            PASSWORD: senhaPadrao,
+        },
+    };
+
+    const authCommand = new AdminInitiateAuthCommand(authParams);
+    const authResult = await cognitoClient.send(authCommand);
+    
+    return {
+        statusCode: 200,
+        body: JSON.stringify({ token: authResult.AuthenticationResult.AccessToken}),
+    };
+}
