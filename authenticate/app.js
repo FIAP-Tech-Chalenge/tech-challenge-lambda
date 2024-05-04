@@ -15,7 +15,7 @@ const { CognitoIdentityProviderClient, AdminInitiateAuthCommand, SignUpCommand, 
 
 const userPoolId = process.env.UserPoolId || 'default_value';
 const clientId = process.env.ClientId || 'default_value';
-const region = process.env.Region || 'default_value';
+const region = process.env.RegionName || 'default_value';
 const cognitoClient = new CognitoIdentityProviderClient({region: region});
 const senhaPadrao = "Mudar#123"
 
