@@ -13,9 +13,9 @@
 
 const { CognitoIdentityProviderClient, AdminInitiateAuthCommand, SignUpCommand, AdminGetUserCommand, AdminConfirmSignUpCommand  } = require("@aws-sdk/client-cognito-identity-provider");
 
-const userPoolId = process.env.USERPOOL_ID || 'default_value';
-const clientId = process.env.CLIENT_ID || 'default_value';
-const region = process.env.REGION || 'default_value';
+const userPoolId = process.env.UserPoolId || 'default_value';
+const clientId = process.env.ClientId || 'default_value';
+const region = process.env.Region || 'default_value';
 const cognitoClient = new CognitoIdentityProviderClient({region: region});
 const senhaPadrao = "Mudar#123"
 
@@ -53,8 +53,7 @@ const validaDadosDeEntrada = (event) => {
         };
     }
     try {
-        body = JSON.parse(event.body);
-        const {cpf, email} = body
+        const {cpf, email} = JSON.parse(event.body)
         if(!((cpf && cpf != "") && (email && email != ""))) {
             return {
                 statusCode: 400,
