@@ -30,7 +30,7 @@ Resources:
         Variables:
           UserPoolId: "default-userpool-id"
           ClientId: "default-client-id"
-          RegionName: "default-region-name"
+          RegionName: !Ref RegionName
 
 # Outputs:
 #   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
