@@ -28,8 +28,8 @@ Resources:
             Method: post
       Environment:
         Variables:
-          UserPoolId: ${{ secrets.USERPOOL_ID }}
-          ClientId: ${{ secrets.CLIENT_ID }}
+          UserPoolId: ${{ secrets.USERPOOLID }}
+          ClientId: ${{ secrets.CLIENTID }}
           RegionName: ${{ secrets.REGION }}
 
 # Outputs:
