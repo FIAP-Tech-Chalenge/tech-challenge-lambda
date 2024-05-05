@@ -3,44 +3,35 @@ Transform: AWS::Serverless-2016-10-31
 Description: >
   tech-challenge-lambda
 
-  Função Lambda para autenticação de um usuário via CPF - FIAP Tech Challenge
-  
-# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+  Função Lambda para autenticacao de um usuário via CPF - FIAP Tech Challenge
+
+
 Globals:
   Function:
     Timeout: 3
 
+Parameters:
+  UserPoolId:
+    Type: String
+  ClientId:
+    Type: String
+
 Resources:
   AuthenticationFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: authenticate/
       Handler: app.lambdaHandler
       Runtime: nodejs18.x
-      # Role: !GetAtt AuthenticationFunctionRole.Arn
       Architectures:
         - x86_64
       Events:
         Authentication:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Type: Api
           Properties:
             Path: /authenticate
             Method: post
       Environment:
         Variables:
-          UserPoolId: "default-userpool-id"
-          ClientId: "default-client-id"
-
-# Outputs:
-#   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
-#   # Find out more about other implicit resources you can reference within SAM
-#   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-#   AuthenticatonApi:
-#     Description: "API Gateway endpoint URL for Prod stage for Hello World function"
-#     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
-#   LabRoleFuncion:
-#     Description: "Hello World Lambda Function ARN"
-#     Value: !GetAtt LabRole.Arn
-#   LabRoleFuncionIamRole:
-#     Description: "Implicit IAM Role created for Hello World function"
-#     Value: !GetAtt LabRole.Arn
+          UserPoolId: !Ref UserPoolId
+          ClientId: !Ref ClientId
