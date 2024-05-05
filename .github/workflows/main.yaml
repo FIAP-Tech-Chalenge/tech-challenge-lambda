@@ -31,4 +31,4 @@ jobs:
       - run: |
           sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --resolve-s3 \
           --parameter-overrides \
-              UserPoolId=${{ secrets.USERPOOLID }}, ClientId=${{ secrets.CLIENTID }}, RegionName=us-east-1
+              UserPoolId=${{ secrets.USERPOOLID }}, ClientId=${{ secrets.CLIENTID }}, RegionName={{ secrets.REGION }}
