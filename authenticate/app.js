@@ -81,7 +81,7 @@ const validaDadosDeEntrada = (event) => {
 const cpfExisteNoBancoDeDadosDaAplicacao = async (cpf, email) => {
     try {
         const client = await databasePool.connect();
-        const response = await client.query(`selectss * from clientes c where c.cpf = '${cpf}' and c.email = '${email}'`);
+        const response = await client.query(`select * from clientes c where c.cpf = '${cpf}' and c.email = '${email}'`);
         return response.rows.length == 1
     } catch (error) {
         throw new Error("DATABASE: Falha ao realizar busca no banco de dados")
