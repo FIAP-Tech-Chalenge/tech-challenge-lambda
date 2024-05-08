@@ -30,4 +30,7 @@ jobs:
       - run: |
           sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --resolve-s3 \
           --parameter-overrides \
-              UserPoolId=${{ secrets.USERPOOLID }} ClientId=${{ secrets.CLIENTID }}
+              UserPoolId=${{ secrets.USERPOOLID }} ClientId=${{ secrets.CLIENTID }} \
+              Host=${{ secrets.HOST }} Port=${{ secrets.PORT }} \
+              User=${{ secrets.USER }} DatabasePassword=${{ secrets.DATABASEPASSWORD }} \
+              DatabaseName=${{ secrets.DATABASENAME }}

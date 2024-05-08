@@ -12,18 +12,27 @@
  */
 
 const { CognitoIdentityProviderClient, AdminInitiateAuthCommand, SignUpCommand, AdminGetUserCommand, AdminConfirmSignUpCommand  } = require("@aws-sdk/client-cognito-identity-provider");
+const { Pool } = require('pg');
 
 const userPoolId = process.env.UserPoolId || 'default_value';
 const clientId = process.env.ClientId || 'default_value';
 const region ="us-east-1";
-const cognitoClient = new CognitoIdentityProviderClient({region: region});
 const senhaPadrao = "Mudar#123"
+const cognitoClient = new CognitoIdentityProviderClient({region: region});
+const databasePool = new Pool({
+    host: process.env.Host || 'default_value',
+    port: process.env.Port || 'default_value',
+    user: process.env.User || 'default_value',
+    password: process.env.DatabasePassword || 'default_value',
+    database: process.env.DatabaseName || 'default_value',
+    ssl: true
+});
 
 module.exports.lambdaHandler = async (event, context) => {
 
     const [cpf, email] = validaDadosDeEntrada(event)
     try {
-        if(cpfExisteNoBancoDeDadosDaAplicacao(cpf)) {
+        if(await cpfExisteNoBancoDeDadosDaAplicacao(cpf, email)) {
             if(await usuarioCadastradoCognito(email)) {
                 return await autenticaUsuarioCognito(email)
             }else{
@@ -69,13 +78,21 @@ const validaDadosDeEntrada = (event) => {
     }
 }
 
-const cpfExisteNoBancoDeDadosDaAplicacao = (cpf) => {
-    return true
+const cpfExisteNoBancoDeDadosDaAplicacao = async (cpf, email) => {
+    try {
+        const client = await databasePool.connect();
+        const response = await client.query(`selectss * from clientes c where c.cpf = '${cpf}' and c.email = '${email}'`);
+        return response.rows.length == 1
+    } catch (error) {
+        throw new Error("DATABASE: Falha ao realizar busca no banco de dados")
+      } finally {
+        console.log("finaly sendo");
+      }
 }
 
 const usuarioCadastradoCognito = async (email) => {
     try {
-        const response = await cognitoClient.send(new AdminGetUserCommand({
+        await cognitoClient.send(new AdminGetUserCommand({
             UserPoolId: userPoolId,
             Username: email,
         }));
@@ -101,10 +118,7 @@ const cadastraUsuarioNoUserPool = async (email) => {
             Username: email,
         }));
     } catch (error) {
-        return {
-            statusCode: 400,
-            body: JSON.stringify({ error: "AWS IAM: Falha ao cadastrar usuário" }),
-        };
+        throw new Error("AWS IAM: Falha ao cadastrar usuário")
     }
 }
 
