@@ -29,6 +29,7 @@ Resources:
   AuthenticationFunction:
     Type: AWS::Serverless::Function
     Properties:
+      PackageType: Zip
       CodeUri: authenticate/
       Handler: app.lambdaHandler
       Runtime: nodejs18.x
