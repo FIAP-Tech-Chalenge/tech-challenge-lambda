@@ -30,7 +30,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       PackageType: Zip
-      CodeUri: authenticate.zip
+      CodeUri: authenticate/
       Handler: app.lambdaHandler
       Runtime: nodejs18.x
       Architectures:
